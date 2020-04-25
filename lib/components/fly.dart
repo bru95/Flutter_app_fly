@@ -27,18 +27,18 @@ class Fly {
   }
 
   void setTargetLocation() {
-    double x = gameLoop.rnd.nextDouble() * (gameLoop.screenSize.width - (gameLoop.tileSize * 2));
-    double y = gameLoop.rnd.nextDouble() * (gameLoop.screenSize.height - (gameLoop.tileSize * 2));
+    double x = gameLoop.rnd.nextDouble() * (gameLoop.screenSize.width - (gameLoop.tileSize * 1.35));
+    double y = (gameLoop.rnd.nextDouble() * (gameLoop.screenSize.height - (gameLoop.tileSize * 2.85))) + (gameLoop.tileSize * 1.5);
     targetLocation = Offset(x, y);
   }
 
-  void render(Canvas canvas) {
-    if(isDead) {
-      deadSprite.renderRect(canvas, flyRect.inflate(2));
+  void render(Canvas c) {
+    if (isDead) {
+      deadSprite.renderRect(c, flyRect.inflate(flyRect.width / 2));
     } else {
-      flyingSprite[flyingSpriteIndex.toInt()].renderRect(canvas, flyRect.inflate(2));
+      flyingSprite[flyingSpriteIndex.toInt()].renderRect(c, flyRect.inflate(flyRect.width / 2));
       if (gameLoop.activeView == View.playing) {
-        callout.render(canvas);
+        callout.render(c);
       }
     }
   }

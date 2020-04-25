@@ -7,7 +7,7 @@ import 'package:flutter_app_fly/game_loop.dart';
 class DroolerFly extends Fly {
 
   DroolerFly (GameLoop gameLoop, double x, double y) : super(gameLoop) {
-    flyRect = Rect.fromLTWH(x, y, gameLoop.tileSize * 1.5, gameLoop.tileSize * 1.5);
+    flyRect = Rect.fromLTWH(x, y, gameLoop.tileSize, gameLoop.tileSize * 1.5);
 
     flyingSprite = List<Sprite>();
     flyingSprite.add(Sprite("flies/drooler-fly-1.png"));
