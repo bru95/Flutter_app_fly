@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:flame/flame.dart';
 import 'package:flame/sprite.dart';
+import 'package:flutter_app_fly/components/callout.dart';
 import 'package:flutter_app_fly/game_loop.dart';
 import 'package:flutter_app_fly/view.dart';
 
@@ -17,8 +19,11 @@ class Fly {
   double get speed => gameLoop.tileSize * 3; //variavel que só pode ser lida
   Offset targetLocation;
 
+  Callout callout;
+
   Fly(this.gameLoop){
     setTargetLocation();
+    callout = Callout(this);
   }
 
   void setTargetLocation() {
@@ -32,6 +37,9 @@ class Fly {
       deadSprite.renderRect(canvas, flyRect.inflate(2));
     } else {
       flyingSprite[flyingSpriteIndex.toInt()].renderRect(canvas, flyRect.inflate(2));
+      if (gameLoop.activeView == View.playing) {
+        callout.render(canvas);
+      }
     }
   }
 
@@ -54,14 +62,24 @@ class Fly {
         flyRect = flyRect.shift(toTarget);
         setTargetLocation();
       }
-
+      callout.update(time);
     }
   }
 
   void onTapDown() {
-    isDead = true;
-    if (gameLoop.activeView == View.playing) {
-      gameLoop.score += 1;
+    if (!isDead) {
+      isDead = true;
+      if (gameLoop.soundButton.isEnabled) {
+        Flame.audio.play(
+            'sfx/ouch${(gameLoop.rnd.nextInt(11) + 1).toString()}.ogg');
+      }
+      if (gameLoop.activeView == View.playing) {
+        gameLoop.score += 1;
+        if (gameLoop.score > (gameLoop.storage.getInt('highscore') ?? 0)) {
+          gameLoop.storage.setInt('highscore', gameLoop.score);
+          gameLoop.highscoreDisplay.updateHighscore();
+        }
+      }
     }
   }
 

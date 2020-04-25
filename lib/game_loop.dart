@@ -9,10 +9,13 @@ import 'package:flutter_app_fly/components/backyard.dart';
 import 'package:flutter_app_fly/components/credits-button.dart';
 import 'package:flutter_app_fly/components/drooler-fly.dart';
 import 'package:flutter_app_fly/components/help-button.dart';
+import 'package:flutter_app_fly/components/highscore-display.dart';
 import 'package:flutter_app_fly/components/house-fly.dart';
 import 'package:flutter_app_fly/components/hungry-fly.dart';
 import 'package:flutter_app_fly/components/macho-fly.dart';
+import 'package:flutter_app_fly/components/music-button.dart';
 import 'package:flutter_app_fly/components/score-display.dart';
+import 'package:flutter_app_fly/components/sound-button.dart';
 import 'package:flutter_app_fly/components/start-button.dart';
 import 'package:flutter_app_fly/controllers/spawner.dart';
 import 'package:flutter_app_fly/view.dart';
@@ -20,6 +23,8 @@ import 'package:flutter_app_fly/view/credits-view.dart';
 import 'package:flutter_app_fly/view/help-view.dart';
 import 'package:flutter_app_fly/view/home-view.dart';
 import 'package:flutter_app_fly/view/lost-view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 import 'components/fly.dart';
 
@@ -49,8 +54,17 @@ class GameLoop extends Game {
   int score;
 
   ScoreDisplay scoreDisplay;
+  HighscoreDisplay highscoreDisplay;
 
-  GameLoop() {
+  final SharedPreferences storage;
+
+  AudioPlayer homeBGM;
+  AudioPlayer playingBGM;
+
+  MusicButton musicButton;
+  SoundButton soundButton;
+
+  GameLoop(this.storage) {
     initialize();
   }
 
@@ -74,6 +88,17 @@ class GameLoop extends Game {
     creditsView = CreditsView(this);
 
     scoreDisplay = ScoreDisplay(this);
+    highscoreDisplay = HighscoreDisplay(this);
+
+    homeBGM = await Flame.audio.loopLongAudio('bgm/home.mp3', volume: .25);
+    homeBGM.pause();
+    playingBGM = await Flame.audio.loopLongAudio('bgm/playing.mp3', volume: .25);
+    playingBGM.pause();
+
+    musicButton = MusicButton(this);
+    soundButton = SoundButton(this);
+
+    playHomeBGM();
   }
 
   void spawnFly() {
@@ -97,6 +122,18 @@ class GameLoop extends Game {
         flies.add(MachoFly(this, x, y));
         break;
     }
+  }
+
+  void playHomeBGM() {
+    playingBGM.pause();
+    playingBGM.seek(Duration.zero);
+    homeBGM.resume();
+  }
+
+  void playPlayingBGM() {
+    homeBGM.pause();
+    homeBGM.seek(Duration.zero);
+    playingBGM.resume();
   }
 
   void onTapDown(TapDownDetails details) {
@@ -138,7 +175,23 @@ class GameLoop extends Game {
       }
     });
 
+    // music button
+    if (musicButton.rect.contains(details.globalPosition)) {
+      musicButton.onTapDown();
+      return;
+    }
+
+    // sound button
+    if (soundButton.rect.contains(details.globalPosition)) {
+      soundButton.onTapDown();
+      return;
+    }
+
     if (activeView == View.playing && !didHitAFly) {
+      if (soundButton.isEnabled) {
+        Flame.audio.play('sfx/haha${(rnd.nextInt(5) + 1).toString()}.ogg');
+      }
+      playHomeBGM();
       activeView = View.lost;
     }
 
@@ -148,6 +201,8 @@ class GameLoop extends Game {
   void render(Canvas canvas) {
     backyard.render(canvas);
 
+    highscoreDisplay.render(canvas);
+
     if (activeView == View.playing) scoreDisplay.render(canvas);
 
     flies.forEach((fly) {
@@ -156,6 +211,9 @@ class GameLoop extends Game {
 
     if (activeView == View.home) homeView.render(canvas);
     if (activeView == View.lost) lostView.render(canvas);
+
+    musicButton.render(canvas);
+    soundButton.render(canvas);
 
     if (activeView == View.home || activeView == View.lost) {
       startButton.render(canvas);
