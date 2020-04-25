@@ -15,9 +15,9 @@ class Callout {
   TextStyle textStyle;
   Offset textOffset;
 
-  Callout(this.fly) {
+  Callout(this.fly, this.value) {
     sprite = Sprite('ui/callout.png');
-    value = 1;
+    //value = 1;
     tp = TextPainter(
       textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,

@@ -6,7 +6,7 @@ import 'package:flutter_app_fly/game_loop.dart';
 
 class HouseFly extends Fly {
 
-  HouseFly (GameLoop gameLoop, double x, double y) : super(gameLoop) {
+  HouseFly (GameLoop gameLoop, double x, double y) : super(gameLoop, 2) {
     //espaço de toque
     flyRect = Rect.fromLTWH(x, y, gameLoop.tileSize, gameLoop.tileSize * 1.5);
 
@@ -14,6 +14,8 @@ class HouseFly extends Fly {
     flyingSprite.add(Sprite("flies/house-fly-1.png"));
     flyingSprite.add(Sprite("flies/house-fly-2.png"));
     deadSprite = Sprite("flies/house-fly-dead.png");
+
+    pointValue = 1;
   }
 
 }

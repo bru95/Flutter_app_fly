@@ -8,13 +8,15 @@ class AgileFly extends Fly {
 
   double get speed => gameLoop.tileSize * 5; //variavel que só pode ser lida
 
-  AgileFly (GameLoop gameLoop, double x, double y) : super(gameLoop) {
+  AgileFly (GameLoop gameLoop, double x, double y) : super(gameLoop, 2) {
     flyRect = Rect.fromLTWH(x, y, gameLoop.tileSize, gameLoop.tileSize * 1.5);
 
     flyingSprite = List<Sprite>();
     flyingSprite.add(Sprite("flies/agile-fly-1.png"));
     flyingSprite.add(Sprite("flies/agile-fly-2.png"));
     deadSprite = Sprite("flies/agile-fly-dead.png");
+
+    pointValue = 1;
   }
 
 }

@@ -64,11 +64,15 @@ class GameLoop extends Game {
   MusicButton musicButton;
   SoundButton soundButton;
 
+  int fase;
+
   GameLoop(this.storage) {
     initialize();
   }
 
   void initialize() async{
+    fase = 0;
+
     flies = List<Fly>();
     score = 0;
     rnd = Random();
@@ -205,6 +209,15 @@ class GameLoop extends Game {
 
     if (activeView == View.playing) scoreDisplay.render(canvas);
 
+    /*flies.forEach((fly) {
+      List<Fly>.from(flies).forEach((fly2) {
+        if (fly.flyRect.overlaps(fly2.flyRect) && !identical(fly, fly2) && !fly.isDead && !fly2.isDead) {
+          fly.isDead = true;
+          fly2.isDead = true;
+        }
+      });
+    });*/
+
     flies.forEach((fly) {
       fly.render(canvas);
     });
@@ -229,6 +242,7 @@ class GameLoop extends Game {
 
     flies.forEach((fly) {
       fly.update(t);
+
     });
     
     flies.removeWhere((fly) {

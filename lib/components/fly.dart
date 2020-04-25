@@ -15,15 +15,17 @@ class Fly {
   List<Sprite> flyingSprite;
   Sprite deadSprite;
   double flyingSpriteIndex = 0;
+  int pointValue;
 
   double get speed => gameLoop.tileSize * 3; //variavel que só pode ser lida
   Offset targetLocation;
 
   Callout callout;
+  double lifeTime;
 
-  Fly(this.gameLoop){
+  Fly(this.gameLoop, this.lifeTime){
     setTargetLocation();
-    callout = Callout(this);
+    callout = Callout(this, lifeTime);
   }
 
   void setTargetLocation() {
@@ -33,6 +35,14 @@ class Fly {
   }
 
   void render(Canvas c) {
+
+    gameLoop.flies.forEach((fly2) {
+      if (flyRect.overlaps(fly2.flyRect) && !identical(this, fly2) && !isDead && !fly2.isDead) {
+        isDead = true;
+        fly2.isDead = true;
+      }
+    });
+
     if (isDead) {
       deadSprite.renderRect(c, flyRect.inflate(flyRect.width / 2));
     } else {
@@ -53,7 +63,7 @@ class Fly {
       flyingSpriteIndex += 30 * time;
       flyingSpriteIndex = flyingSpriteIndex % flyingSprite.length;
 
-      double stepDistance = speed * time;
+      double stepDistance = (speed * (gameLoop.fase + 1)) * time;
       Offset toTarget = targetLocation - Offset(flyRect.left, flyRect.top);
       if (stepDistance < toTarget.distance) {
         Offset stepToTarget = Offset.fromDirection(toTarget.direction, stepDistance);
@@ -62,6 +72,14 @@ class Fly {
         flyRect = flyRect.shift(toTarget);
         setTargetLocation();
       }
+
+      /*gameLoop.flies.forEach((fly2) {
+        if (flyRect.overlaps(fly2.flyRect) && !identical(this, fly2) && !isDead && !fly2.isDead) {
+          isDead = true;
+          fly2.isDead = true;
+        }
+      });*/
+
       callout.update(time);
     }
   }
@@ -74,10 +92,15 @@ class Fly {
             'sfx/ouch${(gameLoop.rnd.nextInt(11) + 1).toString()}.ogg');
       }
       if (gameLoop.activeView == View.playing) {
-        gameLoop.score += 1;
+        gameLoop.score += pointValue;
         if (gameLoop.score > (gameLoop.storage.getInt('highscore') ?? 0)) {
           gameLoop.storage.setInt('highscore', gameLoop.score);
           gameLoop.highscoreDisplay.updateHighscore();
+        }
+        double auxFase = gameLoop.score/3;
+        int nextFase = auxFase.toInt();
+        if (nextFase > gameLoop.fase) {
+          gameLoop.fase = nextFase;
         }
       }
     }
