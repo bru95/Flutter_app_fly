@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flame/sprite.dart';
 import 'package:flutter_app_fly/game_loop.dart';
+import 'package:flutter_app_fly/view.dart';
 
 class Fly {
 
@@ -59,6 +60,9 @@ class Fly {
 
   void onTapDown() {
     isDead = true;
+    if (gameLoop.activeView == View.playing) {
+      gameLoop.score += 1;
+    }
   }
 
 }
